@@ -38,4 +38,4 @@ jobs:
       uses: actions/upload-artifact@v3
       with:
         name: AI学情管理系统安装包
-        path: "AI学情管理系统源文件\dist\AI学情分析系统安装包.exe"
+        path: "AI学情管理系统源文件\\dist\\AI学情分析系统安装包.exe"

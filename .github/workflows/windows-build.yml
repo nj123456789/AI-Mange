@@ -1,3 +1,4 @@
+
 name: Build Windows Installer
 
 on:
@@ -61,7 +62,7 @@ Source: "dist\main.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "students.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "users.json"; DestDir: "{app}"; Flags: ignoreversion
 '@
-          $setupContent | Out-File -FilePath setup.iss -Encoding UTF8
+          $setupContent | Out-File setup.iss -Encoding UTF8
 
       # 7️⃣ Build Installer
       - name: Build Installer

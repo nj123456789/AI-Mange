@@ -10,17 +10,17 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      # 1️⃣ Checkout code
+      # 1️⃣ Checkout repository
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # 2️⃣ Setup Python
+      # 2️⃣ Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
-      # 3️⃣ Install dependencies and PyInstaller
+      # 3️⃣ Install dependencies
       - name: Install dependencies
         run: |
           cd "AI学情管理系统源文件"
@@ -41,7 +41,7 @@ jobs:
           cd "AI学情管理系统源文件"
           pyinstaller --onefile --windowed --add-data "students.json;." --add-data "users.json;." main.py
 
-      # 6️⃣ Generate Inno Setup script safely
+      # 6️⃣ Generate Inno Setup script (PowerShell-safe)
       - name: Generate Inno Setup script
         shell: powershell
         run: |
@@ -61,9 +61,9 @@ Source: "dist\main.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "students.json"; DestDir: "{app}"; Flags: ignoreversion
 Source: "users.json"; DestDir: "{app}"; Flags: ignoreversion
 '@
-          $setupContent | Out-File setup.iss -Encoding UTF8
+          $setupContent | Out-File -FilePath setup.iss -Encoding UTF8
 
-      # 7️⃣ Build Installer with Inno Setup
+      # 7️⃣ Build Installer
       - name: Build Installer
         run: |
           cd "AI学情管理系统源文件"

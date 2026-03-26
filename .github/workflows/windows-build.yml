@@ -3,7 +3,7 @@ name: Build Windows Installer
 on:
   push:
     branches:
-      - main
+      - main  # 只在 push 到 main 分支触发
 
 jobs:
   build-windows-installer:
@@ -39,7 +39,7 @@ jobs:
         run: |
           pyinstaller --onefile --windowed --add-data "students.json;." --add-data "users.json;." main.py
 
-      # 6️⃣ 创建 Inno Setup 脚本
+      # 6️⃣ 生成 Inno Setup 脚本
       - name: Generate Inno Setup script
         run: |
           echo [Setup] > setup.iss
@@ -48,21 +48,23 @@ jobs:
           echo DefaultDirName={pf}\AIStudentSystem >> setup.iss
           echo DefaultGroupName=AIStudentSystem >> setup.iss
           echo OutputBaseFilename=AIStudentSystemInstaller >> setup.iss
+          echo Compression=lzma >> setup.iss
+          echo SolidCompression=yes >> setup.iss
           echo [Files] >> setup.iss
           echo Source: "dist\main.exe"; DestDir: "{app}"; Flags: ignoreversion >> setup.iss
           echo Source: "students.json"; DestDir: "{app}"; Flags: ignoreversion >> setup.iss
           echo Source: "users.json"; DestDir: "{app}"; Flags: ignoreversion >> setup.iss
 
-      # 7️⃣ 使用 Inno Setup 生成安装包
+      # 7️⃣ 使用 Inno Setup 打包安装程序
       - name: Build Installer
         run: |
           "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" setup.iss
 
       # 8️⃣ 上传 EXE 和安装包
       - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: AIStudentSystem-Windows
           path: |
             dist/main.exe
-            Output/AIStudentSystemInstaller.exe
+            AIStudentSystemInstaller.exe

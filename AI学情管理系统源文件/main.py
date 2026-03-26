@@ -1,20 +1,39 @@
-import sys, json, requests
+import sys
+import os
+import json
+import requests
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import *
 from PyQt5.QtGui import QFont, QColor
 from docx import Document
 
+# ========= 数据路径处理 =========
+def get_base_path():
+    """
+    获取 JSON 文件的基路径
+    - 普通 Python 脚本运行时：项目根目录
+    - EXE 打包后运行时：PyInstaller 临时目录
+    """
+    if getattr(sys, 'frozen', False):
+        return sys._MEIPASS
+    else:
+        return os.path.dirname(os.path.abspath(__file__))
+
+BASE_PATH = get_base_path()
+
 # ========= 数据 =========
 SUBJECTS = ["语文", "数学", "英语", "物理", "化学", "生物"]
 
 def load_data(file):
+    path = os.path.join(BASE_PATH, file)
     try:
-        return json.load(open(file, "r", encoding="utf-8"))
+        return json.load(open(path, "r", encoding="utf-8"))
     except:
         return {}
 
 def save_data(file, data):
-    json.dump(data, open(file, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
+    path = os.path.join(BASE_PATH, file)
+    json.dump(data, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=2)
 
 users = load_data("users.json")
 students = load_data("students.json")
@@ -189,7 +208,6 @@ class Main(QWidget):
                 doc.add_paragraph(f"{k}: {v}")
 
             # 添加 AI 分析结果
-            # 如果当前选中学生的分析已经生成，则使用，否则可以自动生成一次
             prompt = f"{name}成绩{scores}请分析"
             ai_result = call_ai(prompt)
             doc.add_heading("AI分析", level=2)

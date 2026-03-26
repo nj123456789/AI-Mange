@@ -3,7 +3,7 @@ name: Build Windows Installer
 on:
   push:
     branches:
-      - main  # 只在 push 到 main 分支触发
+      - main
 
 jobs:
   build-windows-installer:
@@ -41,22 +41,26 @@ jobs:
           cd "AI学情管理系统源文件"
           pyinstaller --onefile --windowed --add-data "students.json;." --add-data "users.json;." main.py
 
-      # 6️⃣ 生成 Inno Setup 脚本
+      # 6️⃣ 生成 Inno Setup 脚本（修正版，PowerShell 安全生成）
       - name: Generate Inno Setup script
+        shell: powershell
         run: |
           cd "AI学情管理系统源文件"
-          echo [Setup] > setup.iss
-          echo AppName=AI学情分析系统 >> setup.iss
-          echo AppVersion=1.0 >> setup.iss
-          echo DefaultDirName={pf}\AIStudentSystem >> setup.iss
-          echo DefaultGroupName=AIStudentSystem >> setup.iss
-          echo OutputBaseFilename=AIStudentSystemInstaller >> setup.iss
-          echo Compression=lzma >> setup.iss
-          echo SolidCompression=yes >> setup.iss
-          echo [Files] >> setup.iss
-          echo Source: "dist\main.exe"; DestDir: "{app}"; Flags: ignoreversion >> setup.iss
-          echo Source: "students.json"; DestDir: "{app}"; Flags: ignoreversion >> setup.iss
-          echo Source: "users.json"; DestDir: "{app}"; Flags: ignoreversion >> setup.iss
+          @'
+[Setup]
+AppName=AI学情分析系统
+AppVersion=1.0
+DefaultDirName={pf}\AIStudentSystem
+DefaultGroupName=AIStudentSystem
+OutputBaseFilename=AIStudentSystemInstaller
+Compression=lzma
+SolidCompression=yes
+
+[Files]
+Source: "dist\main.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "students.json"; DestDir: "{app}"; Flags: ignoreversion
+Source: "users.json"; DestDir: "{app}"; Flags: ignoreversion
+'@ | Out-File setup.iss -Encoding UTF8
 
       # 7️⃣ 使用 Inno Setup 打包安装程序
       - name: Build Installer
